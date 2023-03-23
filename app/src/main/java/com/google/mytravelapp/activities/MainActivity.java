@@ -1,4 +1,4 @@
-package com.google.mytravelapp;
+package com.google.mytravelapp.activities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +14,7 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.mytravelapp.R;
 import com.google.mytravelapp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
