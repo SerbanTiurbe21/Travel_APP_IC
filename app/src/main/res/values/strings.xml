@@ -6,6 +6,13 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="please_add_your_email_address">Please add your email address!</string>
+    <string name="please_add_your_password">Please add your password!</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="first_time_here">First time here?</string>
+    <string name="login">LOGIN</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
