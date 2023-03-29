@@ -13,6 +13,9 @@
     <string name="forgot_password">Forgot password?</string>
     <string name="first_time_here">First time here?</string>
     <string name="login">LOGIN</string>
+    <string name="register">REGISTER</string>
+    <string name="please_add_your_username">Please add your username!</string>
+    <string name="please_re_type_your_password">Please re-type your password!</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
