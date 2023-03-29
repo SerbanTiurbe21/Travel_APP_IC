@@ -16,7 +16,11 @@
     <string name="register">REGISTER</string>
     <string name="please_add_your_username">Please add your username!</string>
     <string name="please_re_type_your_password">Please re-type your password!</string>
-
+    <string name="change_password">CHANGE PASSWORD</string>
+    <string name="please_type_your_old_password">Please type your old password!</string>
+    <string name="please_type_your_new_password">Please type your new password!</string>
+    <string name="please_re_type_your_new_password">Please re-type your new password!</string>
+    <string name="reset_password">Reset password!</string>
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
