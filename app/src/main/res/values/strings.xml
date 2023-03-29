@@ -30,4 +30,9 @@
     <string name="price_in_eur">Price in EUR</string>
     <string name="please_select_an_image">Please select an image!</string>
     <string name="save">SAVE</string>
+    <string name="arriving_date_">Arriving date</string>
+    <string name="leaving_date">Leaving date</string>
+    <string name="degrees">Degrees:</string>
+    <string name="latitude">Latitude:</string>
+    <string name="longitude">Longitude:</string>
 </resources>
