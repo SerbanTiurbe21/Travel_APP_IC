@@ -16,11 +16,21 @@ public class DisplayDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_details);
+
         Intent intent = getIntent();
         String tripName = intent.getStringExtra("tripName");
         String email = intent.getStringExtra("email");
         String destination = intent.getStringExtra("destination");
+
+        setupViews();
+        displayTheDetails(email, tripName);
+        getWeather(destination);
     }
+
+    private void displayTheDetails(String mail, String tripName){
+
+    }
+
     private void setupViews() {
         tripNameDetails = findViewById(R.id.tripNameDetails);
         destinationDetails = findViewById(R.id.destinationDetails);
@@ -31,4 +41,7 @@ public class DisplayDetailsActivity extends AppCompatActivity {
         longitudeDetails = findViewById(R.id.longitudeDetails);
     }
 
+    private void getWeather(String dest) {
+
+    }
 }
