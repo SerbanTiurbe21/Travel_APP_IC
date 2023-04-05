@@ -42,6 +42,5 @@ public class DisplayDetailsActivity extends AppCompatActivity {
     }
 
     private void getWeather(String dest) {
-
     }
 }
