@@ -17,31 +17,31 @@
         android:theme="@style/Theme.MyTravelApp"
         tools:targetApi="31">
         <activity
-            android:name=".DisplayDetailsActivity"
+            android:name=".activities.DisplayDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".EditTripActivity"
+            android:name=".activities.EditTripActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".activities.ForgotPasswordActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activities.RegisterActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".activities.SplashActivity"
