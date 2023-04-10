@@ -7,6 +7,8 @@ public class User {
 
     private String userId;
 
+    private String email;
+
     private String name;
 
     private String password;
@@ -16,10 +18,9 @@ public class User {
     public User() {
     }
 
-    public User(Integer id, String userId, String name, String password, Set<Trip> trips) {
-        this.id = id;
-        this.userId = userId;
+    public User(String name, String email, String password, Set<Trip> trips) {
         this.name = name;
+        this.email = email;
         this.password = password;
         this.trips = trips;
     }
@@ -62,5 +63,13 @@ public class User {
 
     public void setTrips(Set<Trip> trips) {
         this.trips = trips;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
