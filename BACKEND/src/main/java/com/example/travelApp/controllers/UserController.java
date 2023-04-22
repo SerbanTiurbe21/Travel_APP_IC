@@ -38,10 +38,16 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        User newUser = userService.save(user);
-        userService.save(newUser);
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
+        // Check if email already exists
+        Optional<User> existingUser = userService.findByEmail(user.getEmail());
+        if (existingUser.isPresent()) {
+            // Return a 400 Bad Request error with a custom message
+            return ResponseEntity.badRequest().body("The same email cannot be registered.");
+        }
+
+        User savedUser = userService.save(user);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
