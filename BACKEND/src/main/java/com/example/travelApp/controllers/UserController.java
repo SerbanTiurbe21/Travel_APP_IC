@@ -2,6 +2,7 @@ package com.example.travelApp.controllers;
 
 import com.example.travelApp.entities.User;
 import com.example.travelApp.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         User newUser = userService.save(user);
         userService.save(newUser);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
