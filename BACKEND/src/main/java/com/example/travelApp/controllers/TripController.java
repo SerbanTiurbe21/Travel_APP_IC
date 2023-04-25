@@ -1,5 +1,7 @@
 package com.example.travelApp.controllers;
 
+import com.example.travelApp.dto.TripDTO;
+import com.example.travelApp.dto.UserSummaryDTO;
 import com.example.travelApp.entities.Trip;
 import com.example.travelApp.entities.User;
 import com.example.travelApp.services.TripService;
@@ -13,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/trips")
@@ -23,11 +26,41 @@ public class TripController {
     @Autowired
     private UserService userService;
 
+    public TripDTO tripToTripDTO(Trip trip) {
+        User user = trip.getUser();
+        UserSummaryDTO userSummaryDTO = new UserSummaryDTO(user.getId(), user.getUserId(), user.getName(), user.getEmail());
+
+        return new TripDTO(
+                trip.getId(),
+                userSummaryDTO,
+                trip.getTripName(),
+                trip.getStartDate(),
+                trip.getEndDate(),
+                trip.getDestination(),
+                trip.getTripType(),
+                trip.getPrice(),
+                trip.getRating(),
+                trip.getPhotoUri(),
+                trip.getTemperature(),
+                trip.getIsFavourite()
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TripDTO>> getAllTrips() {
+        List<Trip> trips = tripService.findAll();
+        List<TripDTO> tripDTOs = trips.stream()
+                .map(this::tripToTripDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(tripDTOs);
+    }
+
+    /*
     @GetMapping
     public ResponseEntity<List<Trip>> getAllTrips() {
         List<Trip> trips = tripService.findAll();
         return new ResponseEntity<>(trips, HttpStatus.OK);
-    }
+    }*/
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTripById(@PathVariable Integer id) {

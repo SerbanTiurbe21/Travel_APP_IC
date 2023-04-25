@@ -74,4 +74,8 @@ public class UserService {
         // Update the user record in the database with the new userId
         return userRepository.save(savedUser);
     }
+
+    public Optional<User> findByIdWithTrips(Integer id){
+        return userRepository.findByIdWithTrips(id);
+    }
 }
