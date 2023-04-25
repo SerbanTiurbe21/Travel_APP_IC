@@ -159,4 +159,22 @@ public class Trip {
     public void setIsFavourite(Boolean isFavourite) {
         this.isFavourite = isFavourite;
     }
+
+    @Override
+    public String toString() {
+        return "Trip{" +
+                "id=" + id +
+                ", user=" + user +
+                ", tripName='" + tripName + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", destination='" + destination + '\'' +
+                ", tripType='" + tripType + '\'' +
+                ", price=" + price +
+                ", rating=" + rating +
+                ", photoUri='" + photoUri + '\'' +
+                ", temperature=" + temperature +
+                ", isFavourite=" + isFavourite +
+                '}';
+    }
 }

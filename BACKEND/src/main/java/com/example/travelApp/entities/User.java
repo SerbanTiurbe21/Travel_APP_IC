@@ -1,11 +1,14 @@
 package com.example.travelApp.entities;
 
+import com.example.travelApp.serializer.UserSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 
 import java.util.Set;
 
 @Entity
 @Table(name = "users_test")
+@JsonSerialize(using = UserSerializer.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,5 +87,17 @@ public class User {
         this.name = name;
         this.password = password;
         this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", userId='" + userId + '\'' +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", trips=" + trips +
+                '}';
     }
 }
