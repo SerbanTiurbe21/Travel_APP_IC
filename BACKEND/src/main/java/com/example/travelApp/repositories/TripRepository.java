@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Integer> {
+    // Find all trips by a specific user
     List<Trip> findByUser(User user);
 
     // Find all trips by user_id
