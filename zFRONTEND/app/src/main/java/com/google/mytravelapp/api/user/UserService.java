@@ -1,4 +1,4 @@
-package com.google.mytravelapp.api;
+package com.google.mytravelapp.api.user;
 
 import com.google.mytravelapp.database.User;
 
