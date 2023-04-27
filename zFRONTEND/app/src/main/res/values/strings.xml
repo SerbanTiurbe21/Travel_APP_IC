@@ -41,4 +41,9 @@
     <string name="share">Share</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="sea_side">Sea side</string>
+    <string name="mountains">Mountains</string>
+    <string name="city_break">City break</string>
+    <string name="arriving_date">Please add the arriving date!</string>
+    <string name="L_date">Please add the leaving date!</string>
 </resources>
