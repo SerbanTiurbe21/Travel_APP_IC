@@ -1,4 +1,4 @@
-package com.google.mytravelapp.api;
+package com.google.mytravelapp.api.city;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

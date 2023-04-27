@@ -1,4 +1,4 @@
-package com.google.mytravelapp.api;
+package com.google.mytravelapp.api.user;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

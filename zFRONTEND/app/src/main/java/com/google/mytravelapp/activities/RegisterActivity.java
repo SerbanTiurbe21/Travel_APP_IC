@@ -15,8 +15,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.mytravelapp.R;
-import com.google.mytravelapp.api.RetrofitInstance;
-import com.google.mytravelapp.api.UserService;
+import com.google.mytravelapp.api.user.RetrofitInstance;
+import com.google.mytravelapp.api.user.UserService;
 import com.google.mytravelapp.database.User;
 
 import java.io.IOException;
@@ -24,7 +24,6 @@ import java.io.IOException;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class RegisterActivity extends AppCompatActivity {
 
