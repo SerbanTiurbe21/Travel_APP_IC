@@ -46,4 +46,5 @@
     <string name="city_break">City break</string>
     <string name="arriving_date">Please add the arriving date!</string>
     <string name="L_date">Please add the leaving date!</string>
+    <string name="string_">SHARE</string>
 </resources>
