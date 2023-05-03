@@ -62,10 +62,10 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (!isValidPassword(password)) {
-                    Toast.makeText(RegisterActivity.this, "Invalid password!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                //if (!isValidPassword(password)) {
+                    //Toast.makeText(RegisterActivity.this, "Invalid password!", Toast.LENGTH_SHORT).show();
+                    //return;
+                //}
 
                 if (!password.equals(repass)) {
                     Toast.makeText(RegisterActivity.this, "Passwords not matching!", Toast.LENGTH_SHORT).show();
@@ -124,6 +124,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
+
     private void setupViews() {
         emailAddressReg = findViewById(R.id.emailAddressReg);
         usernameReg = findViewById(R.id.usernameReg);
