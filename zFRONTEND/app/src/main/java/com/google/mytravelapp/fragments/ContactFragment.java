@@ -1,5 +1,6 @@
 package com.google.mytravelapp.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,13 +8,22 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.mytravelapp.R;
 
 
 public class ContactFragment extends Fragment {
 
-
+    private static String[] items = {"General question", "Registration difficulties", "Unable to recover password"};
+    AutoCompleteTextView autoCompleteTextView, autoComplete;
+    EditText problemTextContact, nameContact, emailContact;
+    Button buttonSendContact;
+    ArrayAdapter<String> adapterItem;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -24,7 +34,6 @@ public class ContactFragment extends Fragment {
     public ContactFragment() {
 
     }
-
 
     public static ContactFragment newInstance(String param1, String param2) {
         ContactFragment fragment = new ContactFragment();
@@ -47,7 +56,36 @@ public class ContactFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_contact, container, false);
+        autoCompleteTextView = view.findViewById(R.id.autoComplete);
+        problemTextContact = view.findViewById(R.id.problemTextContact);
+        emailContact = view.findViewById(R.id.emailContact);
+        autoComplete = view.findViewById(R.id.autoComplete);
+        buttonSendContact = view.findViewById(R.id.buttonSendContact);
 
-        return inflater.inflate(R.layout.fragment_contact, container, false);
+        String[] myList = getResources().getStringArray(R.array.stringsList);
+
+        adapterItem = new ArrayAdapter<String>(requireContext(), R.layout.dropdown_item, myList);
+        autoCompleteTextView.setAdapter(adapterItem);
+
+        buttonSendContact.setOnClickListener(view1 -> {
+            if (!problemTextContact.getText().toString().isEmpty() && !autoCompleteTextView.getText().toString().isEmpty() && !emailContact.getText().toString().isEmpty()) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"travelbuddy@gmail.com"});
+                intent.putExtra(Intent.EXTRA_SUBJECT, autoCompleteTextView.getText().toString());
+                intent.putExtra(Intent.EXTRA_TEXT, problemTextContact.getText().toString());
+                intent.setType("message/rfc822");
+                if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getContext(), "There is no application to support this action!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(getContext(), "Please fill in all the fields!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        return view;
     }
 }
