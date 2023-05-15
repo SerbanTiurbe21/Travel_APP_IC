@@ -102,4 +102,3 @@ public class UserServiceTests {
         assertEquals(optionalUser, result);
     }
 }
-
