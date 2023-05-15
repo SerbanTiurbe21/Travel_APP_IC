@@ -21,9 +21,6 @@ public class Trip {
         this.email = email;
     }
 
-
-
-
     public String getTripName() {
         return tripName;
     }

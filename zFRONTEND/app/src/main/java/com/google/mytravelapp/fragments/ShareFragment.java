@@ -1,5 +1,6 @@
 package com.google.mytravelapp.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,13 +8,14 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.google.mytravelapp.R;
 
 
 public class ShareFragment extends Fragment {
 
-
+    private Button buttonShare;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -47,7 +49,23 @@ public class ShareFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view =  inflater.inflate(R.layout.fragment_share, container, false);
 
-        return inflater.inflate(R.layout.fragment_share, container, false);
+        buttonShare = view.findViewById(R.id.buttonShare);
+        setButtonShare();
+        return view;
+    }
+
+    private void setButtonShare(){
+        buttonShare.setOnClickListener(view -> {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "https://travelbuddy.ro/");
+            sendIntent.setType("text/plain");
+
+            Intent shareIntent = Intent.createChooser(sendIntent, null);
+            startActivity(shareIntent);
+        });
     }
 }

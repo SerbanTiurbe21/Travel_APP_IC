@@ -79,6 +79,7 @@
     <string name="denardtext">Denard Laza is a highly respected figure in the business world, currently serving as the Vice CEO of his company. His journey to this prestigious position is a testament to his skill, dedication, and unique perspective on business dynamics.</string>
     <string name="yourtrips">Your Trips</string>
     <string name="string_">SHARE</string>
+    <string name="leave_date">Please add the leaving date!</string>
     <string-array name="stringsList">
         <item>"General question"</item>
         <item>"Registration difficulties"</item>
