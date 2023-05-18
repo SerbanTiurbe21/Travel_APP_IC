@@ -5,6 +5,7 @@ import com.example.travelApp.login.LoginRequest;
 import com.example.travelApp.login.LoginResponse;
 import com.example.travelApp.services.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
@@ -31,7 +33,6 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getUserById(@PathVariable Integer id) {
-        //Optional<User> user = userService.findById(id);
         Optional<User> user = userService.findByIdWithTrips(id);
         if (user.isPresent()) {
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
@@ -50,13 +51,10 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
-        // Check if email already exists
         Optional<User> existingUser = userService.findByEmail(user.getEmail());
         if (existingUser.isPresent()) {
-            // Return a 400 Bad Request error with a custom message
             return ResponseEntity.badRequest().body("The same email cannot be registered.");
         }
-
         User savedUser = userService.save(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
@@ -66,9 +64,7 @@ public class UserController {
         Optional<User> foundUser = userService.findByEmail(loginRequest.getEmail());
         if (foundUser.isPresent()) {
             User user = foundUser.get();
-            // Compare the entered password with the stored password
             if (user.getPassword().equals(loginRequest.getPassword())) {
-                // Login successful
                 LoginResponse loginResponse = new LoginResponse();
                 loginResponse.setUser(user);
                 loginResponse.setAccessToken(null);
@@ -76,7 +72,6 @@ public class UserController {
                 return ResponseEntity.ok().body(loginResponse);
             }
         }
-        // Invalid email or password
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
     }
 
@@ -86,29 +81,22 @@ public class UserController {
                                            @RequestParam("newPassword") String newPassword,
                                            @RequestParam("confirmNewPassword") String confirmNewPassword) {
 
-        // Check if newPassword and confirmNewPassword match
         if (!newPassword.equals(confirmNewPassword)) {
             return ResponseEntity.badRequest().body("New password and confirmation do not match");
         }
-
-        // Check if the user with the given email exists
         Optional<User> userOptional = userService.findByEmail(email);
         if (userOptional.isEmpty()) {
-            //return ResponseEntity.badRequest().body("User not found");
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
         User user = userOptional.get();
 
-        // Check if the old password matches
         if (!user.getPassword().equals(oldPassword)) {
             return ResponseEntity.badRequest().body("Old password is incorrect");
         }
 
-        // Set the new password and save the user
         user.setPassword(newPassword);
         userService.save(user);
-
         return ResponseEntity.ok("Password updated successfully");
     }
 

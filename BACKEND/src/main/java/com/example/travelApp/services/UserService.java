@@ -2,15 +2,15 @@ package com.example.travelApp.services;
 
 import com.example.travelApp.entities.User;
 import com.example.travelApp.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class UserService {
-    @Autowired
     private UserRepository userRepository;
 
     public List<User> findAll() {
@@ -37,18 +37,6 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public boolean existsByUserId(String userId) {
-        return userRepository.existsByUserId(userId);
-    }
-
-    public boolean existsByName(String name) {
-        return userRepository.existsByName(name);
-    }
-
-    public boolean existsByEmail(String email){
-        return userRepository.existsByEmail(email);
-    }
-
     public User updateUser(User user){
         User existingUser = userRepository.findByUserId(user.getUserId()).orElse(null);
         existingUser.setName(user.getName());
@@ -57,16 +45,9 @@ public class UserService {
     }
 
     public User save(User user) {
-        // Save the user to the database first to generate the ID
         User savedUser = userRepository.save(user);
-
-        // Remove spaces from the user's name
         String nameWithoutSpaces = savedUser.getName().replace(" ", "");
-
-        // Set the userId to the user's name concatenated with the user's ID
         savedUser.setUserId(nameWithoutSpaces + savedUser.getId());
-
-        // Update the user record in the database with the new userId
         return userRepository.save(savedUser);
     }
 

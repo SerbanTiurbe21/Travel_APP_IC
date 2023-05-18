@@ -6,6 +6,7 @@ import com.example.travelApp.entities.Trip;
 import com.example.travelApp.entities.User;
 import com.example.travelApp.services.TripService;
 import com.example.travelApp.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +18,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
-    @Autowired
-    private TripService tripService;
 
-    @Autowired
-    private UserService userService;
+    private final TripService tripService;
+
+    private final UserService userService;
 
     public TripDTO tripToTripDTO(Trip trip) {
         User user = trip.getUser();
@@ -55,19 +56,11 @@ public class TripController {
         return ResponseEntity.ok(tripDTOs);
     }
 
-    /*
-    @GetMapping
-    public ResponseEntity<List<Trip>> getAllTrips() {
-        List<Trip> trips = tripService.findAll();
-        return new ResponseEntity<>(trips, HttpStatus.OK);
-    }*/
-
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTripById(@PathVariable Integer id) {
         Optional<Trip> trip = tripService.findById(id);
         if (trip.isPresent()) {
             Trip existingTrip = trip.get();
-            //existingTrip.setUser(null); // Set the user to null
             return new ResponseEntity<>(existingTrip, HttpStatus.OK);
         } else {
             Map<String, String> response = new HashMap<>();
@@ -91,7 +84,6 @@ public class TripController {
 
     @PostMapping
     public ResponseEntity<?> createTrip(@RequestBody Trip trip) {
-        // Check if the user exists
         Integer userId = trip.getUser().getId();
         Optional<User> user = userService.findById(userId);
         if (user.isEmpty()) {
@@ -99,8 +91,6 @@ public class TripController {
             response.put("message", "The user with ID " + userId + " doesn't exist.");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-
-        // Save the trip
         Trip newTrip = tripService.save(trip);
         return new ResponseEntity<>(newTrip, HttpStatus.CREATED);
     }
@@ -111,8 +101,6 @@ public class TripController {
 
         if (existingTrip.isPresent()) {
             Trip updatedTrip = existingTrip.get();
-            // Update the fields of the existing trip with the new values from the request
-            // For example: updatedTrip.setTripName(trip.getTripName());
             updatedTrip.setTripName(trip.getTripName());
             updatedTrip.setStartDate(trip.getStartDate());
             updatedTrip.setEndDate(trip.getEndDate());

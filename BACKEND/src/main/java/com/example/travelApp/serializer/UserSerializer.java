@@ -35,12 +35,10 @@ public class UserSerializer extends JsonSerializer<User> {
                 jsonGenerator.writeStringField("photo_uri", trip.getPhotoUri());
                 jsonGenerator.writeNumberField("temperature", trip.getTemperature());
                 jsonGenerator.writeNumberField("is_favourite", trip.getIsFavourite() ? 1 : 0);
-                // Add other trip fields if necessary
                 jsonGenerator.writeEndObject();
             }
         }
         jsonGenerator.writeEndArray();
-
         jsonGenerator.writeEndObject();
     }
 }
