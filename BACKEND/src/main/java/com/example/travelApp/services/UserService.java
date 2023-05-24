@@ -1,6 +1,9 @@
 package com.example.travelApp.services;
 
 import com.example.travelApp.entities.User;
+import com.example.travelApp.exceptions.UnauthorizedException;
+import com.example.travelApp.login.LoginRequest;
+import com.example.travelApp.login.LoginResponse;
 import com.example.travelApp.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,11 +40,32 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public User updateUser(User user){
-        User existingUser = userRepository.findByUserId(user.getUserId()).orElse(null);
-        existingUser.setName(user.getName());
-        existingUser.setPassword(user.getPassword());
-        return userRepository.save(existingUser);
+    public Optional<User> updateUser(Integer id, User user){
+        Optional<User> existingUserOptional = userRepository.findById(id);
+        if (existingUserOptional.isPresent()) {
+            User existingUser = existingUserOptional.get();
+            existingUser.setUserId(user.getUserId());
+            existingUser.setName(user.getName());
+            existingUser.setPassword(user.getPassword());
+            existingUser.setEmail(user.getEmail());
+            userRepository.save(existingUser);
+        }
+        return existingUserOptional;
+    }
+
+    public LoginResponse loginUser(LoginRequest loginRequest) throws UnauthorizedException {
+        Optional<User> foundUser = userRepository.findByEmail(loginRequest.getEmail());
+        if (foundUser.isPresent()) {
+            User user = foundUser.get();
+            if (user.getPassword().equals(loginRequest.getPassword())) {
+                LoginResponse loginResponse = new LoginResponse();
+                loginResponse.setUser(user);
+                loginResponse.setAccessToken(null);
+                loginResponse.setMessage("Login successful.");
+                return loginResponse;
+            }
+        }
+        throw new UnauthorizedException("Invalid email or password.");
     }
 
     public User save(User user) {
@@ -54,4 +78,5 @@ public class UserService {
     public Optional<User> findByIdWithTrips(Integer id){
         return userRepository.findByIdWithTrips(id);
     }
+
 }
