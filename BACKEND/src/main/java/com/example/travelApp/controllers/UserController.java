@@ -1,12 +1,12 @@
 package com.example.travelApp.controllers;
 
 import com.example.travelApp.entities.User;
+import com.example.travelApp.exceptions.UnauthorizedException;
 import com.example.travelApp.login.LoginRequest;
 import com.example.travelApp.login.LoginResponse;
 import com.example.travelApp.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -27,12 +27,11 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.findAll();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getUserById(@PathVariable Integer id) {
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         Optional<User> user = userService.findByIdWithTrips(id);
         if (user.isPresent()) {
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
@@ -44,9 +43,15 @@ public class UserController {
     }
 
     @GetMapping("/find-by-email")
-    public ResponseEntity<User> testFindByEmail(@RequestParam("email") String email) {
+    public ResponseEntity<?> testFindByEmail(@RequestParam("email") String email) {
         Optional<User> user = userService.findByEmail(email);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        if (user.isPresent()) {
+            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        } else {
+            Map<String, String> errorMessage = new HashMap<>();
+            errorMessage.put("error", "User with email " + email + " not found.");
+            return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/register")
@@ -61,18 +66,12 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        Optional<User> foundUser = userService.findByEmail(loginRequest.getEmail());
-        if (foundUser.isPresent()) {
-            User user = foundUser.get();
-            if (user.getPassword().equals(loginRequest.getPassword())) {
-                LoginResponse loginResponse = new LoginResponse();
-                loginResponse.setUser(user);
-                loginResponse.setAccessToken(null);
-                loginResponse.setMessage("Login successful.");
-                return ResponseEntity.ok().body(loginResponse);
-            }
+        try {
+            LoginResponse loginResponse = userService.loginUser(loginRequest);
+            return ResponseEntity.ok().body(loginResponse);
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
     }
 
     @PutMapping("/reset-password")
@@ -101,28 +100,20 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User user) {
-        Optional<User> existingUser = userService.findById(id);
-
-        if (existingUser.isPresent()) {
-            User updatedUser = existingUser.get();
-            updatedUser.setUserId(user.getUserId());
-            updatedUser.setName(user.getName());
-            updatedUser.setPassword(user.getPassword());
-            updatedUser.setEmail(user.getEmail());
-            userService.save(updatedUser);
-            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User user) {
+        Optional<User> updatedUser = userService.updateUser(id, user);
+        if (updatedUser.isPresent()) {
+            return new ResponseEntity<>(updatedUser.get(), HttpStatus.OK);
         } else {
             Map<String, String> errorMessage = new HashMap<>();
             errorMessage.put("error", "User with id " + id + " not found.");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
         Optional<User> user = userService.findById(id);
-
         if (user.isPresent()) {
             userService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

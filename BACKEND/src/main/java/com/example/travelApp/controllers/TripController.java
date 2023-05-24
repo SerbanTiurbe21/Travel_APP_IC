@@ -1,16 +1,16 @@
 package com.example.travelApp.controllers;
 
 import com.example.travelApp.dto.TripDTO;
-import com.example.travelApp.dto.UserSummaryDTO;
 import com.example.travelApp.entities.Trip;
 import com.example.travelApp.entities.User;
+import com.example.travelApp.exceptions.TripNotFoundException;
 import com.example.travelApp.services.TripService;
 import com.example.travelApp.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.travelApp.utility.TripDtoConverter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,31 +27,12 @@ public class TripController {
 
     private final UserService userService;
 
-    public TripDTO tripToTripDTO(Trip trip) {
-        User user = trip.getUser();
-        UserSummaryDTO userSummaryDTO = new UserSummaryDTO(user.getId(), user.getUserId(), user.getName(), user.getEmail());
-
-        return new TripDTO(
-                trip.getId(),
-                userSummaryDTO,
-                trip.getTripName(),
-                trip.getStartDate(),
-                trip.getEndDate(),
-                trip.getDestination(),
-                trip.getTripType(),
-                trip.getPrice(),
-                trip.getRating(),
-                trip.getPhotoUri(),
-                trip.getTemperature(),
-                trip.getIsFavourite()
-        );
-    }
-
     @GetMapping
     public ResponseEntity<List<TripDTO>> getAllTrips() {
         List<Trip> trips = tripService.findAll();
-        List<TripDTO> tripDTOs = trips.stream()
-                .map(this::tripToTripDTO)
+        List<TripDTO> tripDTOs = trips.
+                stream()
+                .map(TripDtoConverter::tripToTripDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(tripDTOs);
     }
@@ -96,27 +77,12 @@ public class TripController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Trip> updateTrip(@PathVariable Integer id, @RequestBody Trip trip) {
-        Optional<Trip> existingTrip = tripService.findById(id);
-
-        if (existingTrip.isPresent()) {
-            Trip updatedTrip = existingTrip.get();
-            updatedTrip.setTripName(trip.getTripName());
-            updatedTrip.setStartDate(trip.getStartDate());
-            updatedTrip.setEndDate(trip.getEndDate());
-            updatedTrip.setDestination(trip.getDestination());
-            updatedTrip.setTripType(trip.getTripType());
-            updatedTrip.setPrice(trip.getPrice());
-            updatedTrip.setRating(trip.getRating());
-            updatedTrip.setPhotoUri(trip.getPhotoUri());
-            updatedTrip.setTemperature(trip.getTemperature());
-            updatedTrip.setIsFavourite(trip.getIsFavourite());
-            tripService.save(updatedTrip);
-            return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
-        } else {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "The trip with ID " + id + " doesn't exist.");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Trip> updateTrip(@PathVariable Integer id, @RequestBody Trip updatedTrip) {
+        try{
+            Trip trip = tripService.updateTrip(id, updatedTrip);
+            return ResponseEntity.ok(trip);
+        }catch (TripNotFoundException e){
+            return ResponseEntity.notFound().build();
         }
     }
 
