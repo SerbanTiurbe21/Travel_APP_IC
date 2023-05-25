@@ -1,17 +1,20 @@
 package com.google.mytravelapp.activities;
 
+import static com.google.mytravelapp.utilities.UtilitySharedPreferences.applyUsernamePreference;
+import static com.google.mytravelapp.utilities.UtilitySharedPreferences.getSharedPrefEmail;
+import static com.google.mytravelapp.utilities.UtilitySharedPreferences.getSharedPrefUsername;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -20,7 +23,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.mytravelapp.R;
+import com.google.mytravelapp.api.user.RetrofitInstance;
+import com.google.mytravelapp.api.user.UserService;
+import com.google.mytravelapp.database.User;
 import com.google.mytravelapp.databinding.ActivityMainBinding;
+
+
+import java.io.IOException;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,12 +41,33 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     TextView userNameHeader, emailHeader;
     View hView;
+    private String username;
 
-    private void replaceFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.nav_host_fragment_content_main, fragment);
-        fragmentTransaction.commit();
+    private void getUserData(String email) {
+        UserService userService = RetrofitInstance.getRetrofitInstance().create(UserService.class);
+        Call<User> call = userService.getUserByEmail(email);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (!response.isSuccessful()) {
+                    Log.e("MainActivity", "Request failed with status code: " + response.code());
+                    return;
+                }
+                User user = response.body();
+                username = user.getName();
+                applyUsernamePreference(getApplicationContext(), username);
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                if (t instanceof IOException) {
+                    Toast.makeText(MainActivity.this, "Network error! Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "An unexpected error occurred. Please try again later.", Toast.LENGTH_SHORT).show();
+                }
+                Log.e("MainActivity", "Find User API call failed: ", t);
+            }
+        });
     }
 
     @Override
@@ -43,9 +77,9 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent intent = getIntent();
-        String username = intent.getStringExtra("username");
-        String email = intent.getStringExtra("email");
+        String userName = getSharedPrefUsername(getApplicationContext());
+        String email = getSharedPrefEmail(getApplicationContext());
+        getUserData(email);
 
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
@@ -55,11 +89,11 @@ public class MainActivity extends AppCompatActivity {
         userNameHeader = hView.findViewById(R.id.userNameHeader);
         emailHeader = hView.findViewById(R.id.emailHeader);
 
-        userNameHeader.setText(username);
+        userNameHeader.setText(userName);
         emailHeader.setText(email);
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home,  R.id.nav_aboutUs, R.id.nav_Contact, R.id.nav_Share)
+                R.id.nav_home, R.id.nav_aboutUs, R.id.nav_Contact, R.id.nav_Share)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);

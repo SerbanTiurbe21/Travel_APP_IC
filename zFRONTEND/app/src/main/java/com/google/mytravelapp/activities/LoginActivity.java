@@ -1,11 +1,14 @@
 package com.google.mytravelapp.activities;
 
+import static com.google.mytravelapp.utilities.UtilitySharedPreferences.applyEmailPreference;
+
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -43,7 +46,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
-                    // Handle successful login
+                    applyEmailPreference(getApplicationContext(),userEmail);
+
                     LoginResponse loginResponse = response.body();
                     String successMessage = loginResponse.getMessage();
                     Toast.makeText(LoginActivity.this, successMessage, Toast.LENGTH_SHORT).show();
@@ -52,10 +56,8 @@ public class LoginActivity extends AppCompatActivity {
                     intent.putExtra("password",password);
                     startActivity(intent);
                 } else {
-                    // Handle invalid email or password
                     try {
                         String errorMessage = response.errorBody().string();
-                        // Show the error message to the user (e.g., using a Toast or TextView)
                         Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -65,33 +67,25 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                // Handle network failure or other issues
                 if (t instanceof IOException) {
-                    // This is a network error (e.g. no internet connection, timeout)
                     Toast.makeText(LoginActivity.this, "Network error! Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
                 } else {
-                    // This is an unexpected error (e.g. a conversion issue in Retrofit)
                     Toast.makeText(LoginActivity.this, "An unexpected error occurred. Please try again later.", Toast.LENGTH_SHORT).show();
                 }
-
-                // You might want to log the error for debugging purposes
                 Log.e("RegisterActivity", "Registration API call failed: ", t);
             }
         });
     }
 
     private void setLoginButtonLogin(){
-        loginButtonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String userEmail = emailAddressLogin.getText().toString();
-                String password = passwordLogin.getText().toString();
-                if(userEmail.isEmpty() || password.isEmpty()){
-                    Toast.makeText(LoginActivity.this, "Please input all the fields!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                loginUser(userEmail,password);
+        loginButtonLogin.setOnClickListener(view -> {
+            String userEmail = emailAddressLogin.getText().toString();
+            String password = passwordLogin.getText().toString();
+            if(userEmail.isEmpty() || password.isEmpty()){
+                Toast.makeText(LoginActivity.this, "Please input all the fields!", Toast.LENGTH_SHORT).show();
+                return;
             }
+            loginUser(userEmail,password);
         });
     }
 

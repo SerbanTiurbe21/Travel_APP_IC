@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.mytravelapp.R;
 
+import lombok.Getter;
+
+@Getter
 public class TripViewHolder extends RecyclerView.ViewHolder {
     private final ImageView imageView2, bookmarkIconCustomRow;
     private final TextView tripNameCustomRow, destinationCustomRow, textView9, ratingCustomRow, emailCustomRow;
@@ -22,33 +25,5 @@ public class TripViewHolder extends RecyclerView.ViewHolder {
         this.textView9 = itemView.findViewById(R.id.textView9);
         this.ratingCustomRow = itemView.findViewById(R.id.ratingCustomRow);
         this.emailCustomRow = itemView.findViewById(R.id.emailCustomRow);
-    }
-
-    public ImageView getImageView2() {
-        return imageView2;
-    }
-
-    public ImageView getBookmarkIconCustomRow() {
-        return bookmarkIconCustomRow;
-    }
-
-    public TextView getTripNameCustomRow() {
-        return tripNameCustomRow;
-    }
-
-    public TextView getDestinationCustomRow() {
-        return destinationCustomRow;
-    }
-
-    public TextView getTextView9() {
-        return textView9;
-    }
-
-    public TextView getRatingCustomRow() {
-        return ratingCustomRow;
-    }
-
-    public TextView getEmailCustomRow() {
-        return emailCustomRow;
     }
 }
