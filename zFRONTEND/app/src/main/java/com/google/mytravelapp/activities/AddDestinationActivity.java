@@ -1,8 +1,11 @@
 package com.google.mytravelapp.activities;
 
+import static com.google.mytravelapp.utilities.UtilitySharedPreferences.getSharedPrefEmail;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -27,6 +30,7 @@ import com.google.mytravelapp.api.user.UserService;
 import com.google.mytravelapp.database.User;
 import com.google.mytravelapp.entities.TripDB;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -54,10 +58,7 @@ public class AddDestinationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_destination);
 
-        Intent intent = getIntent();
-        String email = intent.getStringExtra("email");
-
-        Log.d("caca", email);
+        String email = getSharedPrefEmail(getApplicationContext());
 
         setupViews();
         setImagePickDestination();
@@ -76,81 +77,68 @@ public class AddDestinationActivity extends AppCompatActivity {
             public void onResponse(Call<TripDB> call, Response<TripDB> response) {
                 if (response.isSuccessful()) {
                     TripDB savedTrip = response.body();
-                    // Handle the saved trip object
                     Toast.makeText(getApplicationContext(), "Trip saved successfully", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(AddDestinationActivity.this,MainActivity.class);
-                    //intent.putExtra("tripName",savedTrip.getTripName());
-                    //intent.putExtra("destination",savedTrip.getDestination());
-                    //intent.putExtra("price",savedTrip.getPrice());
-                    //intent.putExtra("stars",savedTrip.getRating());
-                    //intent.putExtra("linkImage",savedTrip.getPhotoUri());
+                    Intent intent = new Intent(AddDestinationActivity.this, MainActivity.class);
                     intent.putExtra("email", email);
-                    startActivityForResult(intent,2);
+                    startActivityForResult(intent, 2);
                 } else {
-                    // Handle the error
                     Toast.makeText(getApplicationContext(), "Error saving trip: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<TripDB> call, Throwable t) {
-                // Handle network error
-                Toast.makeText(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (t instanceof IOException) {
+                    Toast.makeText(AddDestinationActivity.this, "Network error! Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(AddDestinationActivity.this, "An unexpected error occurred. Please try again later.", Toast.LENGTH_SHORT).show();
+                }
+                Log.e("AddDestinationActivity", "AddDestination API call failed: ", t);
             }
         });
     }
 
-    private void test_button(String email){
-        saveButtonDest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String tripName = tripNameDest.getText().toString();
-                String destination = destinationDest.getText().toString();
-                String radioButtonValue = testShit.getText().toString();
-                String price = getValue(priceEurDest.getText().toString());
-                String arrivingDate = arrivingDateDestination.getText().toString();
-                String leavingDate = leavingDateDestination.getText().toString();
-                String stars = String.valueOf(rateValue);
-                String linkImage = String.valueOf(selectedImageUri);
-                UserService userService = RetrofitInstance.getRetrofitInstance().create(UserService.class);
-                Call<User> call = userService.getUserByEmail(email);
+    private void test_button(String email) {
+        saveButtonDest.setOnClickListener(view -> {
+            String tripName = tripNameDest.getText().toString();
+            String destination = destinationDest.getText().toString();
+            String radioButtonValue = testShit.getText().toString();
+            String price = getValue(priceEurDest.getText().toString());
+            String arrivingDate = arrivingDateDestination.getText().toString();
+            String leavingDate = leavingDateDestination.getText().toString();
+            String stars = String.valueOf(rateValue);
+            String linkImage = String.valueOf(selectedImageUri);
+            UserService userService = RetrofitInstance.getRetrofitInstance().create(UserService.class);
 
-                call.enqueue(new Callback<User>() {
-                    @Override
-                    public void onResponse(Call<User> call, Response<User> response) {
-                        if (response.isSuccessful()) {
-                            User user = response.body();
-                            Log.d("user email", user.getEmail());
-                            // Create a new TripDB object and set the user
-                            if(tripName.isEmpty() || destination.isEmpty() || radioButtonValue.isEmpty() || arrivingDate.isEmpty() || leavingDate.isEmpty() || price.isEmpty() ||stars.isEmpty() || linkImage.isEmpty()){
-                                Log.d("tripName", tripName);
-                                Log.d("dest",destination);
-                                Log.d("city_break", radioButtonValue);
-                                Log.d("price", price);
-                                Log.d("date1", arrivingDate);
-                                Log.d("date2", leavingDate);
-                                Log.d("stars", stars);
-                                Log.d("linkimg", linkImage);
-                                return;
-                            }
-                            TripDB trip = new TripDB(user, tripName, arrivingDate, leavingDate, destination, radioButtonValue, Float.parseFloat(price), Float.parseFloat(stars), linkImage, 0f, false);
-                            Log.d("trip link", trip.getPhotoUri());
-                            // Save the trip using the saveTrip method
-                            saveTrip(trip, email);
-                            Toast.makeText(getApplicationContext(), "User fetched successfully", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // Handle the error
-                            Toast.makeText(getApplicationContext(), "Error fetching user: " + response.message(), Toast.LENGTH_SHORT).show();
+            Call<User> call = userService.getUserByEmail(email);
+
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    Log.e("err", response.toString());
+                    if (response.isSuccessful()) {
+                        User user = response.body();
+                        if (tripName.isEmpty() || destination.isEmpty() || radioButtonValue.isEmpty() || arrivingDate.isEmpty() || leavingDate.isEmpty() || price.isEmpty() || stars.isEmpty() || linkImage.isEmpty()) {
+                            return;
                         }
+                        TripDB trip = new TripDB(user, tripName, arrivingDate, leavingDate, destination, radioButtonValue, Float.parseFloat(price), Float.parseFloat(stars), linkImage, 0f, false);
+                        saveTrip(trip, email);
+                        Toast.makeText(getApplicationContext(), "User fetched successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Error fetching user: " + response.message(), Toast.LENGTH_SHORT).show();
                     }
+                }
 
-                    @Override
-                    public void onFailure(Call<User> call, Throwable t) {
-                        // Handle network error
-                        Toast.makeText(getApplicationContext(), "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                @Override
+                public void onFailure(Call<User> call, Throwable t) {
+                    if (t instanceof IOException) {
+                        Toast.makeText(AddDestinationActivity.this, "Network error! Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(AddDestinationActivity.this, "An unexpected error occurred. Please try again later.", Toast.LENGTH_SHORT).show();
                     }
-                });
-            }
+                    Log.e("AddDestinationActivity", "Find User API call failed: ", t);
+                }
+            });
         });
     }
 
@@ -162,7 +150,6 @@ public class AddDestinationActivity extends AppCompatActivity {
                 calendar.set(Calendar.YEAR, year);
                 calendar.set(Calendar.MONTH, month);
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
                 updateCalendar();
                 updateDateRange(year, month, dayOfMonth, leavingDateDestination);
             }
@@ -180,40 +167,24 @@ public class AddDestinationActivity extends AppCompatActivity {
     }
 
     private void updateDateRange(int year1, int month1, int day1, EditText editText) {
-        // Set up the calendar with the selected date
         Calendar calendar = Calendar.getInstance();
         calendar.set(year1, month1, day1);
 
-        // Set an OnClickListener on the second EditText to show the DatePickerDialog when clicked
-        editText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Set up the calendar with the current date
-                Calendar calendar1 = Calendar.getInstance();
-                int year = calendar1.get(Calendar.YEAR);
-                int month = calendar1.get(Calendar.MONTH);
-                int day = calendar1.get(Calendar.DAY_OF_MONTH);
+        editText.setOnClickListener(v -> {
+            Calendar calendar1 = Calendar.getInstance();
+            int year = calendar1.get(Calendar.YEAR);
+            int month = calendar1.get(Calendar.MONTH);
+            int day = calendar1.get(Calendar.DAY_OF_MONTH);
 
-                // Create a DatePickerDialog with a custom DatePicker
-                DatePickerDialog datePickerDialog = new DatePickerDialog(AddDestinationActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int day) {
-                        // Set the second EditText to the selected date
-                        String format = "dd/MM/yy";
-                        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.UK);
-                        editText.setText(sdf.format(calendar1.getTime()));
-                    }
-                }, year, month, day);
+            DatePickerDialog datePickerDialog = new DatePickerDialog(AddDestinationActivity.this, (view, year2, month2, day2) -> {
+                String format = "dd/MM/yy";
+                SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.UK);
+                editText.setText(sdf.format(calendar1.getTime()));
+            }, year, month, day);
 
-                // Get the DatePicker from the DatePickerDialog
-                DatePicker datePicker = datePickerDialog.getDatePicker();
-
-                // Set the min and max dates of the DatePicker based on the selected date
-                datePicker.setMinDate(calendar.getTimeInMillis());
-
-                // Show the DatePickerDialog
-                datePickerDialog.show();
-            }
+            DatePicker datePicker = datePickerDialog.getDatePicker();
+            datePicker.setMinDate(calendar.getTimeInMillis());
+            datePickerDialog.show();
         });
     }
 
@@ -236,10 +207,6 @@ public class AddDestinationActivity extends AppCompatActivity {
 
     private void selectImage() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        //startActivity(intent);
-        //Intent intent = new Intent();
-        //intent.setType("image/*");
-        //intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, SELECT_IMAGE_CODE);
     }
 
@@ -248,7 +215,7 @@ public class AddDestinationActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             Uri uri = data.getData();
-            Log.e("URI",uri.toString());
+            Log.e("URI", uri.toString());
             selectedImageUri = uri;
         }
     }
@@ -280,10 +247,5 @@ public class AddDestinationActivity extends AppCompatActivity {
     private static String getValue(String str) {
         String[] parts = str.split(":");
         return parts[parts.length - 1].trim();
-    }
-
-    public static Float extractNumber(String input) {
-        String number = input.replaceAll("[^0-9]", "");
-        return Float.parseFloat(number);
     }
 }

@@ -80,7 +80,7 @@
             android:id="@+id/textView6"
             android:layout_width="400dp"
             android:layout_height="220dp"
-            android:drawableStart="@drawable/skalve"
+            android:drawableStart="@drawable/ddlddl"
             android:drawablePadding="10dp"
             android:gravity="center"
             android:padding="12dp"
@@ -90,25 +90,6 @@
             app:layout_constraintHorizontal_bias="0.363"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView5" />
-
-        <TextView
-            android:id="@+id/textView69"
-            android:layout_width="384dp"
-            android:layout_height="140dp"
-            android:layout_margin="100dp"
-            android:layout_marginTop="8dp"
-            android:drawableStart="@drawable/resize"
-            android:drawablePadding="10dp"
-            android:gravity="center"
-            android:padding="12dp"
-            android:text="@string/denardtext"
-            android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/textView6"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.566"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5"
-            app:layout_constraintVertical_bias="0.468" />
 
         <TextView
             android:id="@+id/textView7"
