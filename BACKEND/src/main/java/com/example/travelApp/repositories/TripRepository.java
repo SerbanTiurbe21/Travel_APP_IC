@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface TripRepository extends JpaRepository<Trip, Integer> {
     List<Trip> findByUserId(Integer userId);
     Optional<Trip> findById(Integer id);
+    Optional<Trip> findByTripName(String tripName);
 }

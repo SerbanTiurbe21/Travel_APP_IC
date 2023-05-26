@@ -1,12 +1,11 @@
 package com.google.mytravelapp.activities;
 
 import static com.google.mytravelapp.utilities.UtilitySharedPreferences.applyEmailPreference;
+import static com.google.mytravelapp.utilities.UtilitySharedPreferences.applyIdPreference;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 import com.google.mytravelapp.R;
 import com.google.mytravelapp.api.user.RetrofitInstance;
 import com.google.mytravelapp.api.user.UserService;
+import com.google.mytravelapp.database.User;
 import com.google.mytravelapp.login.LoginRequest;
 import com.google.mytravelapp.login.LoginResponse;
 
@@ -38,6 +38,31 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void getUserId(String userEmail){
+        UserService userService = RetrofitInstance.getRetrofitInstance().create(UserService.class);
+        Call<User> call = userService.getUserByEmail(userEmail);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if(response.isSuccessful()){
+                    User user = response.body();
+                    Integer userId = user.getId();
+                    applyIdPreference(getApplicationContext(),userId);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                if (t instanceof IOException) {
+                    Toast.makeText(LoginActivity.this, "Network error! Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, "An unexpected error occurred. Please try again later.", Toast.LENGTH_SHORT).show();
+                }
+                Log.e("RegisterActivity", "Get UserId call failed: ", t);
+            }
+        });
+    }
+
     private void loginUser(String userEmail, String password){
         final LoginRequest loginRequest = new LoginRequest(userEmail,password);
         UserService userService = RetrofitInstance.getRetrofitInstance().create(UserService.class);
@@ -54,6 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent intent = new Intent(LoginActivity.this,MainActivity.class);
                     intent.putExtra("email",userEmail);
                     intent.putExtra("password",password);
+                    getUserId(userEmail);
                     startActivity(intent);
                 } else {
                     try {

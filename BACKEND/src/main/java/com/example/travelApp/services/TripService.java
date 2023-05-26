@@ -34,6 +34,10 @@ public class TripService {
         tripRepository.deleteById(id);
     }
 
+    public Optional<Trip> findByTripName(String tripName){
+        return this.tripRepository.findByTripName(tripName);
+    }
+
     public Trip updateTrip(Integer id, Trip updatedTrip) throws TripNotFoundException {
         return tripRepository.findById(id)
                 .map(trip -> {

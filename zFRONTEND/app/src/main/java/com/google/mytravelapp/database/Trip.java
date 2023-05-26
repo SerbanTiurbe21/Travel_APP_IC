@@ -10,15 +10,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Trip {
-    private Integer id;
-    private User user;
-    private String startDate;
-    private String endDate;
+    private String tripName;
     private String destination;
-    private String tripType;
-    private Float price;
-    private Float rating;
-    private String photoUri;
-    private Float temperature;
-    private Boolean isFavourite;
+    private String imageUrl;
+    private float price;
+    private float rating;
+    private boolean isBookmarked;
+    private String email;
 }
