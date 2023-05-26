@@ -50,6 +50,19 @@ public class TripController {
         }
     }
 
+    @GetMapping("/find-by-name/{tripName}")
+    public ResponseEntity<Object> getTripByName(@PathVariable String tripName){
+        Optional<Trip> trip = tripService.findByTripName(tripName);
+        if (trip.isPresent()) {
+            Trip existingTrip = trip.get();
+            return new ResponseEntity<>(existingTrip, HttpStatus.OK);
+        } else {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "The trip with name " + tripName + " doesn't exist.");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getTripsByUserId(@PathVariable Integer userId) {
         Optional<User> userOptional = userService.findById(userId);

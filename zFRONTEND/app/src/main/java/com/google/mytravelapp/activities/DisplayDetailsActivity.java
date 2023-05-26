@@ -1,9 +1,12 @@
 package com.google.mytravelapp.activities;
 
+import static com.google.mytravelapp.utilities.UtilitySharedPreferences.applyIdPreference;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,6 +14,11 @@ import com.google.mytravelapp.R;
 import com.google.mytravelapp.api.city.Example;
 import com.google.mytravelapp.api.city.Main;
 import com.google.mytravelapp.api.city.WeatherApi;
+import com.google.mytravelapp.api.trip.TripService;
+import com.google.mytravelapp.api.user.RetrofitInstance;
+import com.google.mytravelapp.entities.TripDB;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -21,8 +29,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DisplayDetailsActivity extends AppCompatActivity {
 
     private TextView tripNameDetails, destinationDetails, arrivingDateDetails, leavingDateDetails, weatherDetails, latitudeDetails, longitudeDetails;
-    String url = "api.openweathermap.org/data/2.5/weather?q={city name}&appid={your api key}";
-    String apiKey = "8f0bd97aaf59233622f5cba4c4c86397";
+    private String apiKey = "8f0bd97aaf59233622f5cba4c4c86397";
+    private String arrivingDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,16 +39,42 @@ public class DisplayDetailsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String tripName = intent.getStringExtra("tripName");
-        String email = intent.getStringExtra("email");
         String destination = intent.getStringExtra("destination");
 
         setupViews();
-        displayTheDetails(email, tripName);
+        displayTheDetails(tripName, destination);
+        getTripByName(tripName);
         getWeather(destination);
     }
 
-    private void displayTheDetails(String mail, String tripName) {
+    private void getTripByName(String tripName){
+        TripService tripService = RetrofitInstance.getRetrofitInstance().create(TripService.class);
+        Call<TripDB> call = tripService.getTripsByName(tripName);
+        call.enqueue(new Callback<TripDB>() {
+            @Override
+            public void onResponse(Call<TripDB> call, Response<TripDB> response) {
+                if(response.isSuccessful()){
+                    TripDB tripDB = response.body();
+                    arrivingDateDetails.setText(arrivingDateDetails.getText().toString() + ": " + tripDB.getStartDate());
+                    leavingDateDetails.setText(leavingDateDetails.getText().toString() + ": " + tripDB.getEndDate());
+                }
+            }
 
+            @Override
+            public void onFailure(Call<TripDB> call, Throwable t) {
+                if (t instanceof IOException) {
+                    Toast.makeText(DisplayDetailsActivity.this, "Network error! Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(DisplayDetailsActivity.this, "An unexpected error occurred. Please try again later.", Toast.LENGTH_SHORT).show();
+                }
+                Log.e("DisplayDetailsActivity", "Get trips by name call failed: ", t);
+            }
+        });
+    }
+
+    private void displayTheDetails(String tripName, String destination) {
+        tripNameDetails.setText(tripNameDetails.getText().toString() + ": " + tripName);
+        destinationDetails.setText(destinationDetails.getText().toString() + ": " + destination);
     }
 
     private void setupViews() {

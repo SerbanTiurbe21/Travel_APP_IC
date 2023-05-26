@@ -18,6 +18,13 @@ public class UtilitySharedPreferences {
         return userName;
     }
 
+    public static Integer getSharedPrefId(Context context){
+        SharedPreferences sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+        Integer defaultId = 0;
+        Integer id = sharedPref.getInt("id", defaultId);
+        return id;
+    }
+
     public static void applyEmailPreference(Context context, String userEmail){
         SharedPreferences sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -29,6 +36,13 @@ public class UtilitySharedPreferences {
         SharedPreferences sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("username", userName);
+        editor.apply();
+    }
+
+    public static void applyIdPreference(Context context, Integer id){
+        SharedPreferences sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("id", id);
         editor.apply();
     }
 }
