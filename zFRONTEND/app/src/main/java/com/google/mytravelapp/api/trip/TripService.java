@@ -8,6 +8,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface TripService {
@@ -22,4 +23,7 @@ public interface TripService {
 
     @GET("api/trips/find-by-name/{tripName}")
     Call<TripDB> getTripsByName(@Path("tripName") String tripName);
+
+    @PUT("/api/trips/{id}")
+    Call<TripDB> updateTrip(@Path("id") int id, @Body TripDB trip);
 }
