@@ -113,7 +113,6 @@ public class AddDestinationActivity extends AppCompatActivity {
             call.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
-                    Log.e("err", response.toString());
                     if (response.isSuccessful()) {
                         User user = response.body();
                         if (tripName.isEmpty() || destination.isEmpty() || radioButtonValue.isEmpty() || arrivingDate.isEmpty() || leavingDate.isEmpty() || price.isEmpty() || stars.isEmpty() || linkImage.isEmpty()) {
