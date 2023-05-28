@@ -49,6 +49,7 @@ public class TripService {
                     trip.setPrice(updatedTrip.getPrice());
                     trip.setPrice(updatedTrip.getPrice());
                     trip.setPhotoUri(updatedTrip.getPhotoUri());
+                    trip.setRating(updatedTrip.getRating());
                     trip.setTemperature(updatedTrip.getTemperature());
                     trip.setIsFavourite(updatedTrip.getIsFavourite());
                     return tripRepository.save(trip);

@@ -49,7 +49,6 @@ public class EditTripActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         String tripName = intent.getStringExtra("tripName");
-        Log.e("lol", tripName);
         getIsFav(tripName);
 
         String destination = intent.getStringExtra("destination");
@@ -60,10 +59,17 @@ public class EditTripActivity extends AppCompatActivity {
         sliderEdit.setValue(price);
         priceEurEdit.setText("Price in EUR: " + price);
         ratingEdit.setRating(rating);
+        rateValue = rating;
 
-        allTheSetters(isMarked, tripName, destination, price, rating);
+        updateViews(tripName, destination, price, updatedFav);
+        updateImage();
+        setSlider();
+        setRating();
+        setImagePickEdit();
+
         setSaveButtonEdit(tripName, linkImage);
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -83,12 +89,15 @@ public class EditTripActivity extends AppCompatActivity {
 
     private void updateTrip(Integer id, TripDB tripDB) {
         TripService tripService = RetrofitInstance.getRetrofitInstance().create(TripService.class);
+        tripDB.setRating(rateValue);
         Call<TripDB> call = tripService.updateTrip(id, tripDB);
         call.enqueue(new Callback<TripDB>() {
             @Override
             public void onResponse(Call<TripDB> call, Response<TripDB> response) {
                 if (response.isSuccessful()) {
                     TripDB tripDB = response.body();
+                    tripDB.setRating(rateValue);
+                    Log.e("errRating",String.valueOf(tripDB.getRating()));
                 } else {
                     Toast.makeText(getApplicationContext(), "Error updating trip: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
@@ -114,7 +123,6 @@ public class EditTripActivity extends AppCompatActivity {
             public void onResponse(Call<TripDB> call, Response<TripDB> response) {
                 if (response.isSuccessful()) {
                     TripDB tripDB = response.body();
-                    Log.e("dadadad",String.valueOf(tripDB.getIsFavourite()));
                     isMarked = tripDB.getIsFavourite();
                     bookmarkEdit.setImageResource(isMarked ? R.drawable.ic_gold_baseline_bookmark_24 : R.drawable.ic_baseline_bookmark_24);
                 }
@@ -132,7 +140,7 @@ public class EditTripActivity extends AppCompatActivity {
         });
     }
 
-    private void getTripByName(String name, String destination, Float price, Float rating, String photoUri) {
+    private void getTripByName(String name, String destination, Float price, String photoUri) {
         TripService tripService = RetrofitInstance.getRetrofitInstance().create(TripService.class);
         Call<TripDB> call = tripService.getTripsByName(name);
 
@@ -141,14 +149,10 @@ public class EditTripActivity extends AppCompatActivity {
             public void onResponse(Call<TripDB> call, Response<TripDB> response) {
                 if (response.isSuccessful()) {
                     TripDB tripDB = response.body();
+                    TripDB tripDB1 = new TripDB(tripDB.getUser(), tripDB.getTripName(), tripDB.getStartDate(), tripDB.getEndDate(), destination, tripDB.getTripType(), price, rateValue, photoUri, tripDB.getTemperature(), isMarked);
+                    Log.e("rating22", String.valueOf(tripDB1.getRating()));
 
-                    tripDB.setDestination(destination);
-                    tripDB.setPrice(price);
-                    tripDB.setRating(rating);
-                    tripDB.setPhotoUri(photoUri);
-                    tripDB.setIsFavourite(isMarked);
-
-                    updateTrip(tripDB.getId(), tripDB);
+                    updateTrip(tripDB.getId(), tripDB1);
                 } else {
                     Toast.makeText(getApplicationContext(), "Error fetching trip: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
@@ -170,12 +174,11 @@ public class EditTripActivity extends AppCompatActivity {
         saveButtonEdit.setOnClickListener(view -> {
             String updatedDestination = destinationEdit.getText().toString();
             Float updatedPrice = sliderEdit.getValue();
-            Float updatedRating = ratingEdit.getRating();
 
             if (selectedImageUri == null) {
                 selectedImageUri = Uri.parse(initialUri);
             }
-            getTripByName(name, updatedDestination, updatedPrice, updatedRating, String.valueOf(selectedImageUri));
+            getTripByName(name, updatedDestination, updatedPrice, String.valueOf(selectedImageUri));
             Intent intent = new Intent(EditTripActivity.this, MainActivity.class);
             startActivity(intent);
         });
@@ -192,11 +195,10 @@ public class EditTripActivity extends AppCompatActivity {
         saveButtonEdit = findViewById(R.id.saveButtonEdit);
     }
 
-    private void updateViews(String tripName, String destination, Float price, Float rating, Boolean isBookmarked) {
+    private void updateViews(String tripName, String destination, Float price, Boolean isBookmarked) {
         tripNameEdit.setText(tripName);
         destinationEdit.setText(destination);
         sliderEdit.setValue(price);
-        ratingEdit.setRating(rating);
     }
 
     private void updateImage() {
@@ -239,11 +241,4 @@ public class EditTripActivity extends AppCompatActivity {
         });
     }
 
-    private void allTheSetters(Boolean bookMarkItem, String tripName, String destination, Float price, Float rating) {
-        updateViews(tripName, destination, price, rating, updatedFav);
-        updateImage();
-        setSlider();
-        setRating();
-        setImagePickEdit();
-    }
 }

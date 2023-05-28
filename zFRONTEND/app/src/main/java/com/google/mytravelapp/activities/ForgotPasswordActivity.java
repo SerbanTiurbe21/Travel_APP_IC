@@ -2,6 +2,7 @@ package com.google.mytravelapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -71,6 +72,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(ForgotPasswordActivity.this, "Password reset successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
+                        startActivity(intent);
                     } else {
                         if (response.code() == 404) {
                             Toast.makeText(ForgotPasswordActivity.this, "User not found", Toast.LENGTH_SHORT).show();
